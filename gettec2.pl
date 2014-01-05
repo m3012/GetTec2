@@ -2,22 +2,24 @@
 use strict;
 use warnings;
 
-use LWP::Simple;
 use DateTime;
+use DBI;
+use bs;
 
-my $date = DateTime->now;
-$today = $date->day() ."\.". $date->month() ."\.". $date->year();
+#my $date = DateTime->now;
+my $date = DateTime->new ( year => 2014, month => 1, day => 2 );
+my $today = $date->day() ."\.". $date->month() ."\.". $date->year();
+my $todayZeroPad = sprintf ("%02d", $date->day()) ."\.". sprintf ("%02d", $date->month()) ."\.". $date->year();
+print $todayZeroPad ."\n";
 
-$url = "http://zse.hr/graf_data_dionice.aspx?dionice=HT-R-A&datum=180";
-$content = get($url);
-die "Can't GET $url" if (! defined $content);
+my $host = '192.168.232.133';
+my $database = "gettec";
+my $port = 3306;
+my $tablename = "exchange";
+my $user = "gettec";
+my $pw = "gettec123A";
 
-print $content;
-print "\n\n";
+my $dbh = DBI->connect("DBI:mysql:database=$database;host=$host;port=$port", $user, $pw) or die "Cannot connect to MySQL server\n";
 
-
-
-my @valuesByDate = split ('--++--', $content);
-foreach (@valuesByDate) {
-	
-}
+my $exchange = GetBSExchPage();
+print $exchange;
