@@ -3,8 +3,9 @@
 use strict;
 use warnings;
 
-use LWP::UserAgent;
-use HTTP::Request::Common;
+use LWP::Simple;
+use XML::Simple;
+use Data::Dumper;
 
 BEGIN {
 	require Exporter;
@@ -13,30 +14,39 @@ BEGIN {
 	# Inherit from Exporter to export functions and variables
 	our @ISA         = qw(Exporter);
 	# Functions and variables which are exported by default
-	our @EXPORT      = qw(GetBSExchPage);
+	our @EXPORT      = qw(GetBSExchPage ExtractExchRate);
 	# Functions and variables which can be optionally exported
-	our @EXPORT_OK   = qw(GetBSExchPage);
+	our @EXPORT_OK   = qw(GetBSExchPage ExtractExchRate);
 }
 
 sub GetBSExchPage {
-	my $dateZeroPad = shift @_;
+	my $dateZeroPadReverse = shift @_;
 
-	my $ua = LWP::UserAgent->new;
-	my $response = $ua->request(POST 'http://www.bsi.si/podatki/tec-BS.asp', [dat => $dateZeroPad]);
-	if ($response->is_success) {
-		my $content = $response->content;
-		my $searchString = "Te.ajna lista z dne " . $dateZeroPad;
-		if ($content =~ m/$searchString/) { 
-			return $content;
-		}
-		else {
-			return 0;
-		}
+	#my $url = 'http://www.bsi.si/_data/tecajnice/dtecbs-l.xml';
+	#my $url = 'http://www.bsi.si/_data/tecajnice/dtecbs.xml';
+	my $url = 'http://www.nlb.si/?a=tecajnica&type=individuals&format=xml&date=20140123';
+	
+	my $xml = XML::Simple->new();
+	
+	my $data = $xml->XMLin(get($url));
+	
+	if ($data->{Date} eq $dateZeroPadReverse) {
+		return $data->{rates}{Rate};
 	}
-	else {
-		#print STDERR $response->status_line, "\n";
-		return 0;
+	return 0;
+}
+
+
+sub ExtractExchRate {
+	my $content = shift @_;
+	my $exchange = shift @_;
+	my $value;
+	
+	foreach (@{$content}) {
+		$value = $_;
+		if ($value->{CCu} eq $exchange) { return $value->{Sell}; }
 	}
+	return 0;
 }
 
 END { } 

@@ -1,0 +1,6 @@
+[client]
+host		= 192.168.232.133
+database	= gettec
+port		= 3306
+user		= gettec
+password	= gettec123A
