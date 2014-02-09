@@ -32,7 +32,7 @@ sub GetExchRatePage {
 		#print Dumper ($data->{rates}{Rate});
 		return $data->{rates}{Rate};
 	}
-	print "GetExchRatePage() could not retrieve exchange list!\n";
+	print "ERROR: GetExchRatePage() could not retrieve exchange list!\n";
 	return 0;
 }
 
@@ -49,7 +49,7 @@ sub ExtractExchRate {
 			return $tmp;
 		}
 	}
-	print "ExtractExchRate() could not extract exchange rate!\n";
+	print "ERROR: ExtractExchRate() could not extract exchange rate!\n";
 	return 0;
 }
 
@@ -69,6 +69,32 @@ sub InsertExchRate {
 	}
 }
 
+sub GetLJSETecPage {
+	my $paper = shift @_;
+	
+	my $url = "http://www.ljse.si/cgi-bin/jve.cgi?SecurityID=$paper&doc=818";
+	my $content = get($url);
+	return $content if (defined $content);
+
+	print "ERROR: GetLJSETecPage() could not retrieve exchange rates!\n";
+	return 0;
+}
+
+sub ParseLJSETecPage {
+	my $content = shift @_;
+	
+	$content =~ /<TR><TD vAlign=top>Teèaj<\/TD><TD vAlign=top align=right>(\d*\,\d*)<\/TD>/im;
+	#            <TR><TD vAlign=top>Teèaj< /TD><TD vAlign=top align=right>4,180</TD></TR><TR>
+
+	my $value = $1;
+	$value =~ s/\,/\./;
+	if ($value > 0) { return $value; }
+	
+	print "ERROR: ParseLJSETecPage() could not extract exchange rate!\n";
+	return 0;
+}
+
+
 sub GetZSETecPage {
 	my $paper = shift @_;
 	
@@ -76,7 +102,7 @@ sub GetZSETecPage {
 	my $content = get($url);
 	return $content if (defined $content);
 
-	print "GetZSETecPage() could not retrieve exchange rates!\n";
+	print "ERROR: GetZSETecPage() could not retrieve exchange rates!\n";
 	return 0;
 }
 
@@ -93,7 +119,7 @@ sub ParseZSETecPage {
 		if ($values[0] eq $date) { return $values[4]; }
 	}
 	
-	print "ParseZSETecPage() could not extract exchange rate!\n";
+	print "ERROR: ParseZSETecPage() could not extract exchange rate!\n";
 	return 0;
 }
 
