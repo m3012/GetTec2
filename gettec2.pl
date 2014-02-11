@@ -26,16 +26,16 @@ my $dbh = DBI->connect("DBI:mysql:;" . "mysql_read_default_file=$my_cnf", undef,
 
 my $exchange = GetExchRatePage($todayZeroPadReverse);
 
-my $rate = ExtractExchRate ($exchange, 'USD');
-InsertExchRate ($dbh, $date, 'USD', $rate);
+# get currencies
+my $rate;
+my $sth = $dbh->prepare("SELECT * FROM gettec.currency;");
+$sth->execute ();
+while (my ($currency) = $sth->fetchrow_array) {
+	# get exchange rate
+	$rate = ExtractExchRate ($exchange, $currency);
 
-$rate = ExtractExchRate ($exchange, 'HRK');
-InsertExchRate ($dbh, $date, 'HRK', $rate);
-
-$rate = ExtractExchRate ($exchange, 'MKD');
-InsertExchRate ($dbh, $date, 'MKD', $rate);
-
-$rate = ExtractExchRate ($exchange, 'BAM');
-InsertExchRate ($dbh, $date, 'BAM', $rate);
+	# insert rate into db
+	InsertExchRate ($dbh, $date, $currency, $rate);
+}
 
 $dbh->disconnect;

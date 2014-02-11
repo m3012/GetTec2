@@ -15,7 +15,7 @@ BEGIN {
 	# Inherit from Exporter to export functions and variables
 	our @ISA         = qw(Exporter);
 	# Functions and variables which are exported by default
-	our @EXPORT      = qw(GetExchRatePage ExtractExchRate InsertExchRate GetZSETecPage ParseZSETecPage);
+	our @EXPORT      = qw(GetExchRatePage ExtractExchRate InsertExchRate GetLJSETecPage ParseLJSETecPage GetZSETecPage ParseZSETecPage);
 	# Functions and variables which can be optionally exported
 	our @EXPORT_OK   = qw(GetExchRatePage ExtractExchRate GetZSETecPage ParseZSETecPage);
 }
